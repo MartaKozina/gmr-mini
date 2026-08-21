@@ -17,7 +17,7 @@
 		"format:write": "biome format --write .",
 		"lint": "biome lint .",
 		"lint:fix": "biome lint --write .",
-		"preview": "next build && next start",
+		"preview": "next build --webpack && next start",
 		"start": "next start",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit"
