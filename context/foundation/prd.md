@@ -51,13 +51,29 @@ A hobbyist raw-feeding dog owner — an individual who feeds their dog(s) a raw 
 - The final nutrient summary is shown and kept live even if a category hasn't yet reached its target mass (partial-fill state is not blocked)
 - Changing any ingredient's amount immediately recalculates and re-displays the final nutrient totals
 
+### US-02: User saves and revisits meal recipes
+
+> Added post-MVP (2026-08-26): documents a capability that shipped in code ahead of the written spec — see FR-011/FR-012 below.
+
+- **Given** a logged-in user who has built a valid meal in the calculator (proportions sum to 100%, at least one ingredient added)
+- **When** they name it and save it
+- **Then** it appears in their saved recipes list, showing the pet, daily mass, days, category breakdown, and recomputed nutrient totals, and they can edit its name/mass/days or delete it
+
+#### Acceptance Criteria
+- A recipe can only be saved against a pet the user owns
+- Saved recipes are scoped to the owning user — never visible to another account
+- Editing a recipe changes its name/daily mass/days; the ingredient composition itself is only ever set through the calculator's save flow, not edited in place
+- Deleting a recipe removes it immediately
+
 ## Functional Requirements
 
 ### Pet profile
 - FR-001: User can create a pet with name, weight (in kilograms), and lifestyle (each lifestyle maps to a factor). Priority: must-have
-  > Socrates: Counter-argument considered: weight units are ambiguous (kg vs lbs), risking silently wrong downstream math. Resolution: weight is entered in kilograms; the daily-calorie formula (DER) is weight(kg) × lifestyle factor, per https://petsdiet.pl/jedzenie-pelne-energii/.
-- FR-002: App calculates a suggested daily calorie target (DER) from the pet's weight (kg) and lifestyle factor. Priority: must-have
+  > Socrates: Counter-argument considered: weight units are ambiguous (kg vs lbs), risking silently wrong downstream math. Resolution: weight is entered in kilograms.
+  > Correction (2026-08-21, during implementation): this section originally stated the daily-calorie formula (DER) as a simple `weight(kg) × lifestyle factor`. On verifying the cited source (https://petsdiet.pl/jedzenie-pelne-energii/) directly, that page actually specifies the standard veterinary two-step metabolic formula: `RER = 70 × weight(kg)^0.75` (Resting Energy Requirement, via metabolic body weight), then `DER = RER × lifestyle factor`. The guardrail requires math to match the declared/cited formula, so the corrected two-step formula is what's implemented — the original one-line paraphrase here was inaccurate, not an intentional simplification.
+- FR-002: App calculates a suggested daily calorie target (DER) from the pet's weight (kg) and lifestyle factor, using the corrected formula above. Priority: must-have
   > Socrates: No counter-argument raised; stands as written.
+  > Lifestyle factor table (confirmed 2026-08-21; adults only — puppy/pregnancy/lactation/heavy-work life stages are out of MVP scope, each has its own more complex multiplier per the same source): intact adult ×1.8, neutered/spayed adult ×1.6, low-activity/overweight-prone ×1.4, weight-loss ×1.0, light work/training ×2.0, moderate work ×3.0. Source: https://petsdiet.pl/jedzenie-pelne-energii/.
 
 ### Meal calculator — setup
 - FR-003: User can select a pet from a list in the calculator. Priority: must-have
@@ -77,6 +93,15 @@ A hobbyist raw-feeding dog owner — an individual who feeds their dog(s) a raw 
   > Socrates: Counter-argument considered: a fixed, non-extensible ingredient list may not include ingredients the user actually has on hand. Resolution: accepted as an MVP limitation — user-submitted ingredients are out of scope for v1 (see Non-Goals).
 - FR-009: App calculates and displays the final nutrient totals for the meal, updating live as ingredients or amounts change. Priority: must-have
   > Socrates: No counter-argument raised; stands as written. Recalculation performance/debouncing is a downstream implementation concern, not a PRD-level decision.
+
+### Recipe persistence
+
+> Added post-MVP (2026-08-26): FR-011 and FR-012 below document a capability that shipped in code ahead of the written spec, rather than one planned during shaping. Priority reflects what's actually live, not what was originally scoped for the MVP.
+
+- FR-011: User can save a meal built in the calculator as a named recipe, linked to the pet it was built for. Priority: must-have
+  > Socrates: Counter-argument considered: saving an incomplete or invalid meal (proportions not summing to 100%, no ingredients selected) would persist a broken recipe. Resolution: accepted — save is only enabled once the same validation the calculator already enforces (FR-005's 100%-sum check, at least one ingredient) passes.
+- FR-012: User can browse their saved recipes, edit a recipe's name/daily mass/days, and delete a recipe. Priority: must-have
+  > Socrates: Counter-argument considered: allowing the ingredient composition itself to be edited in place would need re-exposing the full calculator UI from the list view. Resolution: accepted as a v1 limitation — editing is scoped to the summary fields (name, daily mass, days); changing composition means building a new recipe via the calculator's save flow (FR-011).
 
 ## Non-Functional Requirements
 

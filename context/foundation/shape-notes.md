@@ -73,6 +73,10 @@ Login required (account-based). Flat user model — every authenticated user has
 - FR-002: App calculates a suggested daily calorie target (DER) from the pet's weight (kg) and lifestyle factor. Priority: must-have
   > Socrates: No counter-argument raised; stands as written.
 
+> **Correction (2026-08-21, during implementation)**: FR-001's formula line above ("weight(kg) × lifestyle factor") was inaccurate. The cited source (https://petsdiet.pl/jedzenie-pelne-energii/) specifies the standard two-step formula: `RER = 70 × weight(kg)^0.75`, then `DER = RER × lifestyle factor`. See `context/foundation/prd.md`'s corrected FR-001/FR-002 for the full correction and the confirmed 6-key lifestyle factor table (adults only).
+
+> **Addendum (2026-08-26, post-MVP)**: a recipe save/browse/edit/delete capability shipped in code ahead of the written spec. See `context/foundation/prd.md`'s FR-011/FR-012 and US-02 for the back-filled requirements.
+
 ### Meal calculator — setup
 - FR-003: User can select a pet from a list in the calculator. Priority: must-have
   > Socrates: Counter-argument considered: a user with zero pets hits a dead end (empty/broken list). Resolution: accepted — see FR-010, a new defensive FR covering the empty-pets state.
