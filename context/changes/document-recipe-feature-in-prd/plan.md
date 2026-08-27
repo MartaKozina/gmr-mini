@@ -107,14 +107,14 @@ Not applicable — documentation-only change, no code paths affected. Verificati
 
 #### Automated
 
-- [x] 1.1 `grep -c "^- FR-" context/foundation/prd.md` returns 12
-- [x] 1.2 `grep -c "^### US-" context/foundation/prd.md` returns 2
-- [x] 1.3 `grep -q "FR-011" context/foundation/shape-notes.md` succeeds
-- [x] 1.4 `grep -q "Resolved 2026-08-26" context/foundation/roadmap.md` succeeds
+- [x] 1.1 `grep -c "^- FR-" context/foundation/prd.md` returns 12 — c14aa58
+- [x] 1.2 `grep -c "^### US-" context/foundation/prd.md` returns 2 — c14aa58
+- [x] 1.3 `grep -q "FR-011" context/foundation/shape-notes.md` succeeds — c14aa58
+- [x] 1.4 `grep -q "Resolved 2026-08-26" context/foundation/roadmap.md` succeeds — c14aa58
 
 #### Manual
 
-- [x] 1.5 New PRD subsection reads consistently with existing FR entries
-- [x] 1.6 US-02 doesn't duplicate or contradict US-01
-- [x] 1.7 shape-notes.md note is a pointer, not a duplicate
-- [x] 1.8 roadmap.md annotation doesn't disturb the rest of the Open Roadmap Questions section
+- [x] 1.5 New PRD subsection reads consistently with existing FR entries — c14aa58
+- [x] 1.6 US-02 doesn't duplicate or contradict US-01 — c14aa58
+- [x] 1.7 shape-notes.md note is a pointer, not a duplicate — c14aa58
+- [x] 1.8 roadmap.md annotation doesn't disturb the rest of the Open Roadmap Questions section — c14aa58

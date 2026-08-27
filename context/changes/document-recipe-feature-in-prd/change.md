@@ -1,7 +1,7 @@
 ---
 change_id: document-recipe-feature-in-prd
 title: Document recipe feature in prd
-status: implementing
+status: implemented
 created: 2026-08-26
 updated: 2026-08-26
 archived_at: null
