@@ -4,4 +4,24 @@
 	--font-sans:
 		var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
 		"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+	/* Warm, earthy palette — deliberately not the default dark-purple T3/Vercel
+	   gradient template look. */
+	--color-background: #faf6ee;
+	--color-foreground: #2b2420;
+	--color-card: #ffffff;
+	--color-card-foreground: #2b2420;
+	--color-border: #e6dcc8;
+	--color-primary: #3f6b4a;
+	--color-primary-foreground: #ffffff;
+	--color-accent: #c1683c;
+	--color-accent-foreground: #ffffff;
+	--color-muted: #f1e9d8;
+	--color-muted-foreground: #7a6f5f;
+	--color-destructive: #b3261e;
+}
+
+body {
+	background-color: var(--color-background);
+	color: var(--color-foreground);
 }

@@ -12,7 +12,16 @@ const globalForDb = globalThis as unknown as {
 	conn: postgres.Sql | undefined;
 };
 
-const conn = globalForDb.conn ?? postgres(env.DATABASE_URL);
+const conn =
+	globalForDb.conn ??
+	postgres(env.DATABASE_URL, {
+		// Recycle connections proactively so a long-running dev server (e.g.
+		// across a laptop sleep/wake, which can leave the cached connection's
+		// TCP socket half-open through Docker/colima port-forwarding) doesn't
+		// hang for several seconds on a dead connection before failing.
+		idle_timeout: 20,
+		max_lifetime: 60 * 30,
+	});
 if (env.NODE_ENV !== "production") globalForDb.conn = conn;
 
 export const db = drizzle(conn, { schema });

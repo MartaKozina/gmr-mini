@@ -10,11 +10,15 @@ import type { AdapterAccount } from "next-auth/adapters";
  */
 export const createTable = pgTableCreator((name) => `gmr-mini_${name}`);
 
-export const posts = createTable(
-	"post",
+export const pets = createTable(
+	"pet",
 	(d) => ({
 		id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-		name: d.varchar({ length: 256 }),
+		name: d.varchar({ length: 256 }).notNull(),
+		// real, not numeric: Drizzle's `numeric` column returns a string unless
+		// `{ mode: "number" }` is set explicitly — a silent footgun for DER math.
+		weightKg: d.real().notNull(),
+		lifestyle: d.varchar({ length: 32 }).notNull(),
 		createdById: d
 			.varchar({ length: 255 })
 			.notNull()
@@ -25,11 +29,47 @@ export const posts = createTable(
 			.notNull(),
 		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
 	}),
+	(t) => [index("pet_created_by_idx").on(t.createdById)],
+);
+
+export const petsRelations = relations(pets, ({ many }) => ({
+	recipes: many(recipes),
+}));
+
+export const recipes = createTable(
+	"recipe",
+	(d) => ({
+		id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+		name: d.varchar({ length: 256 }).notNull(),
+		petId: d
+			.integer()
+			.notNull()
+			.references(() => pets.id),
+		dailyMassGrams: d.real().notNull(),
+		days: d.integer().notNull(),
+		proportions: d.jsonb().notNull().$type<Record<string, number>>(),
+		selectedIngredients: d
+			.jsonb()
+			.notNull()
+			.$type<{ ingredientId: string; grams: number }[]>(),
+		createdById: d
+			.varchar({ length: 255 })
+			.notNull()
+			.references(() => users.id),
+		createdAt: d
+			.timestamp({ withTimezone: true })
+			.$defaultFn(() => /* @__PURE__ */ new Date())
+			.notNull(),
+	}),
 	(t) => [
-		index("created_by_idx").on(t.createdById),
-		index("name_idx").on(t.name),
+		index("recipe_created_by_idx").on(t.createdById),
+		index("recipe_pet_idx").on(t.petId),
 	],
 );
+
+export const recipesRelations = relations(recipes, ({ one }) => ({
+	pet: one(pets, { fields: [recipes.petId], references: [pets.id] }),
+}));
 
 export const users = createTable("user", (d) => ({
 	id: d
