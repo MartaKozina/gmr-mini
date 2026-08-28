@@ -6,6 +6,9 @@
 		"useIgnoreFile": true,
 		"clientKind": "git"
 	},
+	"files": {
+		"includes": ["**", "!.claude/.10x-cli-manifest.json"]
+	},
 	"assist": {
 		"enabled": true,
 		"actions": {
