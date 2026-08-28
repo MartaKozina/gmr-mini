@@ -1,32 +1,37 @@
-# Create T3 App
+# gmr-mini
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+A raw-feeding meal calculator for dogs. Add a dog (weight, lifestyle) and get a
+suggested daily energy target, then build a meal in three steps — set category
+proportions, add specific ingredients, and watch calories, protein, fat, and
+calcium:phosphorus update live as you go. Save meals as recipes and revisit
+them later.
 
-## What's next? How do I make an app with this?
+This is a lean, from-scratch rewrite of the author's own existing product
+(givemeraw.com) — no migration of old code, data, or users. Full requirements
+live in [`context/foundation/prd.md`](context/foundation/prd.md); the
+domain-logic risk map lives in
+[`context/foundation/test-plan.md`](context/foundation/test-plan.md).
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+Built on the [T3 Stack](https://create.t3.gg/): Next.js 16 (App Router) + tRPC
++ Drizzle ORM (Postgres) + NextAuth v5 (Google OAuth) + Tailwind + Biome, on
+pnpm.
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Getting started
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+1. Copy `.env.example` to `.env` and fill in `AUTH_SECRET` (generate with
+   `npx auth secret`), `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET` (from the
+   [Google Cloud console](https://console.cloud.google.com/apis/credentials)),
+   and `DATABASE_URL`.
+2. Start local Postgres: `./start-database.sh` (spins up a Docker/Podman
+   container using the host/port/db name/password parsed from `DATABASE_URL`).
+3. Push the schema: `pnpm db:push`.
+4. `pnpm dev` — dev server at `http://localhost:3000`.
 
-## Learn More
-
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
-
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
-
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+Before considering any change done, run `pnpm check` (Biome + `tsc --noEmit`)
+and `pnpm test` (Vitest). See [`CLAUDE.md`](CLAUDE.md) for the full command
+reference, architecture notes, and the project's non-obvious gotchas
+(deliberately pinned dependency versions, the Turbopack build-time bug that
+requires `--webpack`, etc.).
 
 ### The tested rule
 
