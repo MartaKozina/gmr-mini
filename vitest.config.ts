@@ -6,7 +6,7 @@ export default defineConfig({
 	test: {
 		environment: "happy-dom",
 		setupFiles: ["./vitest.setup.ts"],
-		exclude: ["**/node_modules/**", "**/*.scaffold/**"],
+		exclude: ["**/node_modules/**", "**/*.scaffold/**", "tests/e2e/**"],
 	},
 	resolve: {
 		alias: {
