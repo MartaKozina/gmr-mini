@@ -14,7 +14,7 @@ tech_stack:
 
 **Deploy on Vercel.**
 
-You're already familiar with Vercel, and `tech-stack.md` recorded it as the starter's own default deployment target — no new tooling to learn. It clears all five agent-friendly criteria (CLI-first, managed/serverless, agent-readable docs, stable deploy API, a GA hosted MCP server), and none of your hard requirements (no persistent connections needed, single region is fine) rule it out. The trade-off you're accepting knowingly: no co-located Postgres (it's Neon-via-marketplace) and a real, documented bill-shock risk that must be mitigated on day one by enabling Spend Management — not left as a someday task.
+You're already familiar with Vercel, and `tech-stack.md` recorded it as the starter's own default deployment target — no new tooling to learn. It clears all five agent-friendly criteria (CLI-first, managed/serverless, agent-readable docs, stable deploy API, a GA hosted MCP server), and none of your hard requirements (no persistent connections needed, single region is fine) rule it out. The trade-off you're accepting knowingly: no co-located Postgres (it's Neon-via-marketplace). The bandwidth bill-shock risk found in the cross-check below turned out to be **Pro-tier-only** — confirmed after actually deploying (see the correction note in the Risk Register): the free **Hobby** plan this project runs on has no metered overage billing at all; it pauses the project on limit instead of charging. Spend Management (the mitigation) is a Pro-only feature, and isn't offered on Hobby because there's nothing to cap.
 
 ## Platform Comparison
 
@@ -62,6 +62,8 @@ Was the original top recommendation on pure cost/co-location fit — native Post
 
 ### Pre-Mortem — How This Could Fail
 
+*(Note: this narrative describes a Pro-tier failure mode. Confirmed post-deploy that this project runs on the free Hobby plan, where the described billing mechanism doesn't exist — see the Risk Register correction below. Kept here as the reasoning trail, and as the relevant scenario if this project ever upgrades to Pro.)*
+
 The team deployed gmr-mini on Vercel, drawn by familiarity and the zero-config Next.js integration. Six months later, it was a mess — not from a code bug, but from the bill. A stated goal from day one was minimizing cost, so nobody enabled Vercel's Spend Management hard cap, assuming the Pro tier's included bandwidth was a safe ceiling. Then a botnet found the app's public sign-in page and hammered it for two days. Every byte of that attack traffic — none of it real users — got billed at Vercel's standard overage rate once the 1TB allowance was gone. The monthly bill went from roughly $20 to over $700 before anyone noticed, because nobody was watching a dashboard for a side project. Meanwhile, the Postgres data lived in Neon, reached through Vercel's marketplace layer — a second vendor's pricing was now also this project's problem, despite the original preference for one co-located platform. The underestimated risk: choosing the familiar platform without turning on the one setting that would have prevented exactly this.
 
 ### Unknown Unknowns
@@ -84,7 +86,7 @@ The team deployed gmr-mini on Vercel, drawn by familiarity and the zero-config N
 
 | Risk | Source | Likelihood | Impact | Mitigation |
 |---|---|---|---|---|
-| Bandwidth overage bill shock (up to tens of thousands of dollars in documented cases) | Devil's advocate | M | H | Enable Spend Management with a hard cap in Settings → Billing before the first production deploy, not after. |
+| Bandwidth overage bill shock — **corrected post-deploy**: this only applies on the Pro plan. The Hobby (free) plan this project actually runs on has no metered overage billing — it pauses the project when a limit is hit instead of charging. Spend Management is Pro-only and isn't offered on Hobby (confirmed in the dashboard: it's listed under "Upgrade to Pro"). | Devil's advocate → corrected by direct observation, 2026-08-21 | L (on Hobby; would return to M/H if upgraded to Pro) | L (on Hobby, worst case is downtime, not a bill; H if ever on Pro without the cap enabled) | On Hobby: no action needed — there's nothing to cap. **If this project ever upgrades to Pro** (e.g. once Hobby's non-commercial restriction stops applying), enable Spend Management with a hard cap *before* that upgrade takes effect, not after. |
 | Postgres billed through a second vendor (Neon-via-marketplace), not co-located | Devil's advocate / Research finding | H (certain, by design) | L | Accepted trade-off for platform familiarity; monitor Neon's own status page separately from Vercel's. |
 | `vercel.json` function-duration override silently ignored on tRPC catch-all route | Unknown unknowns | M | M | After first deploy, explicitly test a long-running tRPC call in production and confirm the configured duration applies; don't assume from config alone. |
 | Rollback doesn't revert database migrations | Research finding | M | H | Before any schema-changing deploy, confirm the Drizzle migration is backward-compatible or have a tested down-migration ready; never treat `vercel rollback` as a full undo. |
@@ -96,7 +98,7 @@ The team deployed gmr-mini on Vercel, drawn by familiarity and the zero-config N
 1. Install the CLI: `npm i -g vercel` (or `npx vercel` per-command without a global install).
 2. From the project root, run `vercel link` to connect this repo to a Vercel project (creates one if none exists).
 3. Set production environment variables via the dashboard or CLI: `vercel env add AUTH_GOOGLE_ID production`, repeating for `AUTH_GOOGLE_SECRET`, `AUTH_SECRET`, and `DATABASE_URL`.
-4. **Before the first real deploy**: go to Settings → Billing → Spend Management and set a hard cap — this is the single highest-leverage mitigation from the cross-check above.
+4. ~~Before the first real deploy: go to Settings → Billing → Spend Management and set a hard cap~~ — **corrected post-deploy**: this project runs on the Hobby (free) plan, where Spend Management doesn't exist and isn't needed (no metered overage billing on Hobby — it pauses the project on limit instead of charging). Revisit only if/when upgrading to Pro.
 5. Deploy: `vercel --prod`. Verify the build actually used `next build --webpack` as configured in `package.json`'s `build` script (Vercel respects the project's own script, not its own default builder choice).
 6. Add a redirect URI for production in the Google Cloud Console OAuth client (`https://<your-domain>/api/auth/callback/google`) alongside the existing localhost one.
 
