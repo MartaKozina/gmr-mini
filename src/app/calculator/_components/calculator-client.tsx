@@ -135,7 +135,7 @@ export function CalculatorClient() {
 							min="0"
 							onChange={(e) => setDailyMassGrams(Number(e.target.value))}
 							type="number"
-							value={dailyMassGrams}
+							value={dailyMassGrams === 0 ? "" : dailyMassGrams}
 						/>
 					</label>
 
@@ -171,7 +171,7 @@ export function CalculatorClient() {
 								}
 								step="0.1"
 								type="number"
-								value={proportions[category]}
+								value={proportions[category] === 0 ? "" : proportions[category]}
 							/>
 						</label>
 					))}
@@ -189,7 +189,7 @@ export function CalculatorClient() {
 							min="1"
 							onChange={(e) => setDays(Number(e.target.value))}
 							type="number"
-							value={days}
+							value={days === 0 ? "" : days}
 						/>
 					</label>
 					<p className="text-muted-foreground text-sm">
